@@ -1,5 +1,6 @@
 import torch
 
+
 def torch_kernel(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor) -> torch.Tensor:
     B, N_CTX, H, D_HEAD = q.shape
     q_b = q.view(B * N_CTX, H, D_HEAD)

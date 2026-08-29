@@ -1,6 +1,7 @@
 import torch
 import torch.nn.functional as F
 
+
 def torch_kernel(
     x: torch.Tensor,
     running_mean: torch.Tensor,
