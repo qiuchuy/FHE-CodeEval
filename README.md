@@ -57,5 +57,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) before adding or changing a benchmark.
 
 ## License
 
-No license has been specified yet. Until one is added, all rights are reserved
-by the repository owner.
+This project is licensed under the [MIT License](LICENSE).
