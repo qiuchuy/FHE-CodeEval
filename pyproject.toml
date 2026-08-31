@@ -1,6 +1,41 @@
+[project]
+name = "fhe-codeeval"
+version = "0.1.0"
+description = "Benchmark for evaluating LLM-generated OpenFHE/CKKS programs"
+readme = "README.md"
+requires-python = "==3.10.*"
+license = { file = "LICENSE" }
+dependencies = [
+    "anthropic==0.91.0",
+    "Jinja2==3.1.6",
+    "numpy==2.2.6",
+    "openai==2.30.0",
+    "openfhe==1.5.1.0.22.4; sys_platform == 'linux' and platform_machine == 'x86_64'",
+    "PyYAML==6.0.3",
+    "simulate-ckks",
+    "torch==2.5.0",
+    "tqdm==4.67.3",
+]
+
+[project.optional-dependencies]
+dev = ["ruff==0.12.10"]
+
+[tool.uv]
+package = false
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+simulate-ckks = { path = "packages/simulate-ckks", editable = true }
+torch = { index = "pytorch-cpu" }
+
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py310"
+extend-exclude = ["benchmarks", "packages/simulate-ckks"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]

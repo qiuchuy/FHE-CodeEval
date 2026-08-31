@@ -1,0 +1,55 @@
+# Copy this file to configs/local/<run-name>.yaml before editing it.
+# Run with:
+#   uv run python run_benchmark.py --config configs/local/<run-name>.yaml
+
+# Generation method: one_shot | feedback | agentic
+method: one_shot
+
+# Human-readable model label stored in reports.
+model: claude-sonnet-4-6
+
+# API provider: anthropic | openai | anthropic-compatible | openai-compatible
+model_provider: anthropic
+model_id: claude-sonnet-4-6
+model_base_url: null
+model_base_url_env: ANTHROPIC_BASE_URL
+
+# Keep secrets out of config files. Export this variable before running.
+model_api_key: null
+model_api_key_env: ANTHROPIC_API_KEY
+
+# API generation controls. Use null to leave an optional setting unset.
+model_max_tokens: 8192
+model_temperature: 0
+model_enable_thinking: null
+# null uses the selected model preset; set true/false for a custom endpoint.
+model_use_max_completion_tokens: null
+model_extra_params: {}
+model_timeout_seconds: 1800
+model_retries: 2
+
+# Claude Code wall-clock budget for each agentic trial (paper: 90 minutes).
+agentic_timeout_seconds: 5400
+
+# Run identity and case selection.
+run_id: null
+cases:
+  - packing-oriented-operators/dot-product
+exclude_prefixes: []
+
+# The paper uses five independent rollouts per model-case setting.
+sampling_num: 5
+
+# The feedback setting uses five repair rounds after the initial generation.
+feedback_rounds: 5
+
+# Execution controls.
+num_workers: 1
+dry_run: false
+no_eval: false
+setup_only: false
+skip_completed: false
+
+# false: simulator hacking checks + real OpenFHE correctness/latency.
+# true: simulator hacking checks + simulator correctness/latency only.
+simulate: false

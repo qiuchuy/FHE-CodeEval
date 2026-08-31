@@ -3,12 +3,28 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+.cache/
 
 # Virtual environments
 .venv/
 venv/
 
+# Local configs, generated kernels, trajectories, and reports
+configs/local/
+runs/
+artifacts/
+outputs/
+build/
+dist/
+*.egg-info/
+
 # Editors and operating systems
 .DS_Store
 .idea/
 .vscode/
+
+# Credentials
+.env
+.env.*
+*.pem
+*.key

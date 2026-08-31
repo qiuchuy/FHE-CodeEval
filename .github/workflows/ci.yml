@@ -9,24 +9,58 @@ permissions:
 
 jobs:
   quality:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.12"
+          python-version: "3.10"
 
-      - name: Install Ruff
-        run: python -m pip install ruff
+      - name: Install locked environment
+        run: uv sync --locked --extra dev
 
       - name: Lint
-        run: ruff check .
+        run: uv run ruff check .
 
       - name: Check formatting
-        run: ruff format --check .
+        run: uv run ruff format --check .
 
-      - name: Validate benchmark layout
-        run: python -m unittest discover -s tests -v
+      - name: Compile public Python sources
+        run: >-
+          uv run python -m compileall -q
+          run_benchmark.py evaluate.py report.py fhe_codeeval
+          packages/simulate-ckks benchmarks
+
+      - name: Import evaluation backends
+        run: uv run python -c "import openfhe, simulate_ckks"
+
+      - name: Validate the 46-case registry
+        run: |
+          uv run python - <<'PY'
+          from collections import Counter
+          from pathlib import Path
+          import yaml
+
+          registry = yaml.safe_load(Path("fhe_codeeval/registry/benchmarks.yaml").read_text())
+          expected = {
+              "packing-oriented-operators": 20,
+              "approximation-oriented-operators": 14,
+              "compositional-subgraphs": 7,
+              "neural-network-workloads": 5,
+          }
+          assert len(registry) == 46
+          assert Counter(case["category"] for case in registry) == expected
+          assert len({case["id"] for case in registry}) == 46
+          assert all(Path(case["torch_ref"]).is_file() for case in registry)
+          PY
+
+      - name: Render a benchmark prompt
+        run: >-
+          uv run python run_benchmark.py
+          --config configs/template.yaml
+          --cases packing-oriented-operators/dot-product
+          --sampling-num 1
+          --dry-run

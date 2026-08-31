@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "simulate-ckks"
+version = "0.1.0"
+description = "Cleartext CKKS simulation backend for OpenFHE"
+requires-python = "==3.10.*"
+dependencies = ["numpy>=2.0"]
+license = { file = "LICENSE" }
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+only-include = ["simulate_ckks.py"]

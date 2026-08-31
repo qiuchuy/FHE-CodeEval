@@ -1,0 +1,109 @@
+You are an expert in Fully Homomorphic Encryption (FHE).
+Your task is to convert a PyTorch kernel into a functionally equivalent
+implementation using the OpenFHE Python bindings with the CKKS scheme.
+
+You should implement the original plaintext program with HE primitives
+provided by OpenFHE. Do not use PyTorch or NumPy operations as fallback
+solutions in `fhe_kernel`.
+
+Case: `{{ case_id }}`
+Task: {{ task_description }}
+
+## Input Specification
+
+{{ input_specification }}
+
+### Notes
+
+- All float tensors use `dtype=torch.float32` unless otherwise stated.
+- Independent random test inputs will be generated at evaluation.
+
+{% if activation_ranges %}
+### Observed Activation Ranges (if available)
+
+{{ activation_ranges }}
+
+{% endif %}
+## Reference Source
+
+```python
+{{ pytorch_reference }}
+```
+
+## Response Format
+
+Return ONLY a Python file containing four functions plus any module-level
+constants needed, such as `MULTIPLICATIVE_DEPTH`, `RING_DIM`, `N_SLOTS`,
+`ROTATION_INDICES`, `OUTPUT_SHAPE`, and `SCALING_MOD_SIZE`.
+
+```python
+# Module-level constants derived from the circuit and input shapes
+MULTIPLICATIVE_DEPTH = ...   # number of multiplicative levels needed
+SCALING_MOD_SIZE     = ...   # bits per rescaling modulus
+RING_DIM             = ...   # power-of-two ring dimension
+N_SLOTS              = ...   # CKKS batch size
+ROTATION_INDICES     = [...] # all rotations used in fhe_kernel
+OUTPUT_SHAPE         = [...] # PyTorch output shape
+
+def make_context():
+    """Crypto context init: CCParamsCKKSRNS, GenCryptoContext, KeyGen,
+    EvalMultKeyGen, EvalRotateKeyGen. Takes no arguments; all parameters
+    come from module-level constants. Returns (cc, keys)."""
+    parameters = openfhe.CCParamsCKKSRNS()
+    parameters.SetMultiplicativeDepth(MULTIPLICATIVE_DEPTH)
+    parameters.SetScalingModSize(SCALING_MOD_SIZE)
+    parameters.SetScalingTechnique(openfhe.ScalingTechnique.FIXEDMANUAL)
+    parameters.SetSecurityLevel(openfhe.HEStd_128_classic)
+    parameters.SetRingDim(RING_DIM)
+    parameters.SetBatchSize(N_SLOTS)
+    cc = openfhe.GenCryptoContext(parameters)
+    cc.Enable(openfhe.PKESchemeFeature.PKE)
+    cc.Enable(openfhe.PKESchemeFeature.KEYSWITCH)
+    cc.Enable(openfhe.PKESchemeFeature.LEVELEDSHE)
+    cc.Enable(openfhe.PKESchemeFeature.ADVANCEDSHE)
+    keys = cc.KeyGen()
+    cc.EvalMultKeyGen(keys.secretKey)
+    cc.EvalRotateKeyGen(keys.secretKey, ROTATION_INDICES)
+    return cc, keys
+
+def encrypt(cc, keys, arg1, arg2, ...):
+    """Encode and encrypt inputs. The remaining arguments match the
+    torch_kernel signature. Ciphertext-role inputs must be encrypted with
+    cc.Encrypt; model weights and biases must be encoded as plaintexts with
+    cc.MakeCKKSPackedPlaintext. Do not call model(x), model.forward(x), or run
+    any part of a neural network forward pass inside encrypt()."""
+
+def fhe_kernel(cc, keys, enc_inputs):
+    """Core FHE computation only. This is the only wall-clock timed function.
+    Do not perform crypto setup, encoding, encryption, decryption,
+    Plaintext.GetRealPackedValue(), PyTorch, or NumPy computation here. Return
+    openfhe.Ciphertext or list[openfhe.Ciphertext], never a torch.Tensor."""
+
+def decrypt(cc, keys, ct_out):
+    """Decrypt ct_out and return a torch.Tensor with the same shape and values,
+    within tolerance, as the PyTorch reference output."""
+```
+
+- `make_context()` takes no arguments; put all circuit parameters in
+  module-level constants.
+- `encrypt()`, `fhe_kernel()`, and `decrypt()` receive `cc` and `keys` as their
+  first two arguments.
+- `fhe_kernel(cc, keys, enc_inputs)` is the only function that is wall-clock
+  timed.
+- `decrypt()` must return a `torch.Tensor` with the correct shape and dtype.
+- All four functions must be defined at module level.
+- Do not include test code, `if __name__ == "__main__"` blocks, or code that
+  calls these functions directly.
+
+## Example
+
+{{ example_problem_and_solution }}
+
+## Requirements
+
+1. Declare module-level constants: `MULTIPLICATIVE_DEPTH`, `RING_DIM`,
+   `N_SLOTS`, `ROTATION_INDICES`, `OUTPUT_SHAPE`, `SCALING_MOD_SIZE`.
+2. Define `make_context()`, `encrypt(...)`, `fhe_kernel(...)`, and `decrypt(...)`.
+3. Use `ScalingTechnique.FIXEDMANUAL` and `HEStd_128_classic`.
+4. Do not hard-code evaluator inputs or outputs.
+5. Do not use PyTorch or NumPy for encrypted computation.

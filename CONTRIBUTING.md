@@ -1,24 +1,31 @@
 # Contributing
 
-## Adding a benchmark
+FHE-CodeEval's public benchmark taxonomy is fixed to the 46 cases described in
+the paper. Changes to case names, categories, input metadata, or reference
+semantics should therefore be discussed before opening a pull request.
 
-1. Place the reference at
-   `benchmarks/<tier>/<category>/<operation>/torch_/ref.py`.
-2. Define exactly one top-level `torch_kernel` function in that file.
-3. Keep the kernel deterministic and free of file, network, and global-state
-   side effects.
-4. Use tensor arguments rather than generating inputs inside the kernel.
-5. Document any fixed parameters (such as stride, padding, or reduction axis)
-   in the pull request.
+## Editing an existing case
 
-Run the repository checks before submitting a change:
+- References live at `benchmarks/<paper-category>/<case-name>/ref.py`.
+- Keep exactly one module-level `torch_kernel` entry point.
+- Keep `input_specs` in `fhe_codeeval/registry/benchmarks.yaml` in the same
+  order as the function arguments.
+- Preserve `seed_id` when renaming a public ID so deterministic evaluation
+  inputs do not change.
+- Use `sampling_strategy: uniform` or `stratified` explicitly.
+- Do not commit generated kernels, run reports, trajectories, credentials, or
+  local configs.
+
+Install the locked development environment and run the public checks:
 
 ```bash
-ruff check .
-ruff format --check .
-python -m unittest discover -s tests -v
+uv sync --locked --extra dev
+uv run ruff check .
+uv run ruff format --check .
+uv run python -m compileall -q run_benchmark.py evaluate.py report.py fhe_codeeval
+uv run python run_benchmark.py \
+  --config configs/template.yaml \
+  --cases packing-oriented-operators/dot-product \
+  --sampling-num 1 \
+  --dry-run
 ```
-
-Behavioral changes to existing references should include the reason for the
-change and the expected input and output shapes. Avoid bundling unrelated
-benchmark changes in the same commit.

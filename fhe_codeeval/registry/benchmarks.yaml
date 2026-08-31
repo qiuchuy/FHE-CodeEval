@@ -1,0 +1,1177 @@
+# FHE-CodeEval benchmark registry.
+#
+# Each benchmark id is `{category}/{case_name}` using the four categories in
+# the paper. `seed_id` preserves the run-branch id used to derive deterministic
+# test-input seeds. `sampling_strategy` is either `uniform` (every sample uses
+# the full declared range) or `stratified` (samples use equal-width subranges).
+#
+# input_specs fields:
+#   name:  argument name matching the torch_kernel signature
+#   shape: list of ints (tensor shape)
+#   dtype: float32 | int64
+#   range: [min, max] (for random generation)
+#   type:  tensor (default) | scalar (passed as Python int/float, not tensor)
+#   value: fixed value (only for type: scalar)
+#   role:  ciphertext (default) | plaintext
+
+- id: packing-oriented-operators/matmul
+  seed_id: linear/matmul
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: matmul
+  torch_ref: benchmarks/packing-oriented-operators/matmul/ref.py
+  description: Matrix multiply (128x64) @ (64x128) [Rotom]
+  n_test_inputs: 5
+  input_specs:
+    - name: a
+      shape:
+        - 128
+        - 64
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: b
+      shape:
+        - 64
+        - 128
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/double-matmul
+  seed_id: linear/double-matmul
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: double-matmul
+  torch_ref: benchmarks/packing-oriented-operators/double-matmul/ref.py
+  description: Double matrix multiply A(128x64) @ B(64x128) @ C(128x64) [Rotom]
+  n_test_inputs: 5
+  input_specs:
+    - name: a
+      shape:
+        - 128
+        - 64
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: b
+      shape:
+        - 64
+        - 128
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: c
+      shape:
+        - 128
+        - 64
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/ttm
+  seed_id: linear/ttm
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: ttm
+  torch_ref: benchmarks/packing-oriented-operators/ttm/ref.py
+  description: 'Tensor-times-matrix: 3D tensor (64x64x64) @ matrix (64x64) [Rotom]'
+  n_test_inputs: 5
+  input_specs:
+    - name: t
+      shape:
+        - 64
+        - 64
+        - 64
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: m
+      shape:
+        - 64
+        - 64
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/convolution
+  seed_id: linear/convolution
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: convolution
+  torch_ref: benchmarks/packing-oriented-operators/convolution/ref.py
+  description: 2D convolution (8x32x32 input, 1x1x3x3 kernel, stride=1, same padding) [Rotom]
+  n_test_inputs: 5
+  input_specs:
+    - name: a
+      shape:
+        - 8
+        - 32
+        - 32
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: b
+      shape:
+        - 1
+        - 1
+        - 3
+        - 3
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/logreg-matvecmul
+  seed_id: linear/logreg-matvecmul
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: logreg-matvecmul
+  torch_ref: benchmarks/packing-oriented-operators/logreg-matvecmul/ref.py
+  description: 'Logistic regression mat-vec-mul: M1(256x1024) @ M0(1024x256) @ v(256x1) [Rotom]'
+  n_test_inputs: 5
+  input_specs:
+    - name: v
+      shape:
+        - 256
+        - 1
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: m_0
+      shape:
+        - 1024
+        - 256
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: plaintext
+    - name: m_1
+      shape:
+        - 256
+        - 1024
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/dot-product
+  seed_id: linear/dot-product
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: dot-product
+  torch_ref: benchmarks/packing-oriented-operators/dot-product/ref.py
+  description: Dot product of two length-16 ciphertext vectors
+  n_test_inputs: 5
+  input_specs:
+    - name: a
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: b
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/hamming-dist
+  seed_id: linear/hamming-dist
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: hamming-dist
+  torch_ref: benchmarks/packing-oriented-operators/hamming-dist/ref.py
+  description: Sum of the Hamming-distance polynomial a + b - 2ab over two length-16 ciphertext vectors
+  n_test_inputs: 5
+  input_specs:
+    - name: a
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - 0
+        - 1
+      role: ciphertext
+    - name: b
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - 0
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/l2-distance
+  seed_id: linear/l2-distance
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: l2-distance
+  torch_ref: benchmarks/packing-oriented-operators/l2-distance/ref.py
+  description: Squared L2 distance between two length-16 ciphertext vectors
+  n_test_inputs: 5
+  input_specs:
+    - name: a
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: b
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/lin-reg
+  seed_id: linear/lin-reg
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: lin-reg
+  torch_ref: benchmarks/packing-oriented-operators/lin-reg/ref.py
+  description: Element-wise y + mx + b over two length-16 ciphertext vectors and plaintext scalars
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: y
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: m
+      type: scalar
+      value: 5.0
+      role: plaintext
+    - name: b
+      type: scalar
+      value: 2.0
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/poly-reg
+  seed_id: linear/poly-reg
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: poly-reg
+  torch_ref: benchmarks/packing-oriented-operators/poly-reg/ref.py
+  description: Element-wise quadratic polynomial regression over five length-16 ciphertext vectors
+  n_test_inputs: 5
+  input_specs:
+    - name: c0
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: c1
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: c2
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: c3
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: c4
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/poly-derivative
+  seed_id: linear/poly-derivative
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: poly-derivative
+  torch_ref: benchmarks/packing-oriented-operators/poly-derivative/ref.py
+  description: Cubic polynomial and derivative evaluation at 16 ciphertext values with plaintext coefficients
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: coeffs
+      shape:
+        - 4
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/dct
+  seed_id: linear/dct
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: dct
+  torch_ref: benchmarks/packing-oriented-operators/dct/ref.py
+  description: Four-point DCT-style transform with plaintext coefficients
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 4
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: p
+      shape:
+        - 4
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/box-blur
+  seed_id: linear/box-blur
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: box-blur
+  torch_ref: benchmarks/packing-oriented-operators/box-blur/ref.py
+  description: Unnormalized 3x3 box filter on an 8x8 ciphertext image with zero padding
+  n_test_inputs: 5
+  input_specs:
+    - name: img
+      shape:
+        - 8
+        - 8
+      dtype: float32
+      range:
+        - 0
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/gx-kernel
+  seed_id: linear/gx-kernel
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: gx-kernel
+  torch_ref: benchmarks/packing-oriented-operators/gx-kernel/ref.py
+  description: 3x3 Sobel horizontal-gradient filter on an 8x8 ciphertext image with zero padding
+  n_test_inputs: 5
+  input_specs:
+    - name: img
+      shape:
+        - 8
+        - 8
+      dtype: float32
+      range:
+        - 0
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/gy-kernel
+  seed_id: linear/gy-kernel
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: gy-kernel
+  torch_ref: benchmarks/packing-oriented-operators/gy-kernel/ref.py
+  description: 3x3 Sobel vertical-gradient filter on an 8x8 ciphertext image with zero padding
+  n_test_inputs: 5
+  input_specs:
+    - name: img
+      shape:
+        - 8
+        - 8
+      dtype: float32
+      range:
+        - 0
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/sobel
+  seed_id: linear/sobel
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: sobel
+  torch_ref: benchmarks/packing-oriented-operators/sobel/ref.py
+  description: Squared Sobel gradient magnitude on an 8x8 ciphertext image with zero padding
+  n_test_inputs: 5
+  input_specs:
+    - name: img
+      shape:
+        - 8
+        - 8
+      dtype: float32
+      range:
+        - 0
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/roberts-cross
+  seed_id: linear/roberts-cross
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: roberts-cross
+  torch_ref: benchmarks/packing-oriented-operators/roberts-cross/ref.py
+  description: Squared Roberts cross gradient magnitude on an 8x8 ciphertext image with zero padding
+  n_test_inputs: 5
+  input_specs:
+    - name: img
+      shape:
+        - 8
+        - 8
+      dtype: float32
+      range:
+        - 0
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/sum
+  seed_id: linear/sum
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: sum
+  torch_ref: benchmarks/packing-oriented-operators/sum/ref.py
+  description: Full tensor sum reduction
+  n_test_inputs: 5
+  input_specs:
+    - name: input_tensor
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/mean
+  seed_id: linear/mean
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: mean
+  torch_ref: benchmarks/packing-oriented-operators/mean/ref.py
+  description: Mean reduction along dim=0
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 4
+        - 64
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: packing-oriented-operators/avgpool
+  seed_id: linear/avgpool
+  sampling_strategy: uniform
+  category: packing-oriented-operators
+  name: avgpool
+  torch_ref: benchmarks/packing-oriented-operators/avgpool/ref.py
+  description: 2D average pooling
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 1
+        - 4
+        - 16
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: kernel_size
+      type: scalar
+      value: 2
+    - name: stride
+      type: scalar
+      value: 2
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/relu
+  seed_id: nonlinear/relu
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: relu
+  torch_ref: benchmarks/approximation-oriented-operators/relu/ref.py
+  description: ReLU activation (requires polynomial approximation in FHE)
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/gelu
+  seed_id: nonlinear/gelu
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: gelu
+  torch_ref: benchmarks/approximation-oriented-operators/gelu/ref.py
+  description: GELU activation with tanh approximation
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/sigmoid
+  seed_id: nonlinear/sigmoid
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: sigmoid
+  torch_ref: benchmarks/approximation-oriented-operators/sigmoid/ref.py
+  description: Sigmoid activation
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/silu
+  seed_id: nonlinear/silu
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: silu
+  torch_ref: benchmarks/approximation-oriented-operators/silu/ref.py
+  description: SiLU (Sigmoid Linear Unit) activation
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/exp
+  seed_id: nonlinear/exp
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: exp
+  torch_ref: benchmarks/approximation-oriented-operators/exp/ref.py
+  description: Element-wise exponential over the input range [-3, 3]
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/sqrt
+  seed_id: nonlinear/sqrt
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: sqrt
+  torch_ref: benchmarks/approximation-oriented-operators/sqrt/ref.py
+  description: Element-wise square root over the input range [0.01, 3.0]
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - 0.01
+        - 3.0
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/sign
+  seed_id: nonlinear/sign
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: sign
+  torch_ref: benchmarks/approximation-oriented-operators/sign/ref.py
+  description: Sign function (requires high-degree polynomial approx)
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/min
+  seed_id: nonlinear/min
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: min
+  torch_ref: benchmarks/approximation-oriented-operators/min/ref.py
+  description: Min reduction along dim=0 (requires polynomial approx in FHE)
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 4
+        - 64
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/softmax
+  seed_id: nonlinear/softmax
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: softmax
+  torch_ref: benchmarks/approximation-oriented-operators/softmax/ref.py
+  description: Softmax over last dimension (requires exp + sum reduction)
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 4
+        - 16
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/layernorm
+  seed_id: nonlinear/layernorm
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: layernorm
+  torch_ref: benchmarks/approximation-oriented-operators/layernorm/ref.py
+  description: Layer normalization over last dimension (eps=1e-12)
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 4
+        - 64
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/batchnorm
+  seed_id: nonlinear/batchnorm
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: batchnorm
+  torch_ref: benchmarks/approximation-oriented-operators/batchnorm/ref.py
+  description: Batch normalisation using current batch statistics (requires variance + inverse-sqrt)
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 8
+        - 32
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/tanh
+  seed_id: nonlinear/tanh
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: tanh
+  torch_ref: benchmarks/approximation-oriented-operators/tanh/ref.py
+  description: Hyperbolic tangent activation (requires polynomial approximation)
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - -3
+        - 3
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/log
+  seed_id: nonlinear/log
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: log
+  torch_ref: benchmarks/approximation-oriented-operators/log/ref.py
+  description: Natural logarithm (requires polynomial approximation over positive domain)
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - 0.01
+        - 3.0
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: approximation-oriented-operators/inverse
+  seed_id: nonlinear/inverse
+  sampling_strategy: stratified
+  category: approximation-oriented-operators
+  name: inverse
+  torch_ref: benchmarks/approximation-oriented-operators/inverse/ref.py
+  description: Multiplicative inverse 1/x (building block for softmax and normalization)
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 64
+      dtype: float32
+      range:
+        - 0.01
+        - 3.0
+      role: ciphertext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: compositional-subgraphs/linear-relu
+  seed_id: compositional/linear-relu
+  sampling_strategy: uniform
+  category: compositional-subgraphs
+  name: linear-relu
+  torch_ref: benchmarks/compositional-subgraphs/linear-relu/ref.py
+  description: 'MLP block: Linear(64, 32) followed by ReLU'
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 1
+        - 64
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: compositional-subgraphs/conv2d-relu
+  seed_id: compositional/conv2d-relu
+  sampling_strategy: uniform
+  category: compositional-subgraphs
+  name: conv2d-relu
+  torch_ref: benchmarks/compositional-subgraphs/conv2d-relu/ref.py
+  description: 'CNN block: Conv2d(2, 4, kernel_size=3, padding=1) followed by ReLU'
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 1
+        - 2
+        - 8
+        - 8
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: compositional-subgraphs/linear-square
+  seed_id: compositional/linear-square
+  sampling_strategy: uniform
+  category: compositional-subgraphs
+  name: linear-square
+  torch_ref: benchmarks/compositional-subgraphs/linear-square/ref.py
+  description: 'FHE-friendly MLP block: Linear(8, 4) followed by exact square activation'
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 1
+        - 8
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: compositional-subgraphs/conv2d-square
+  seed_id: compositional/conv2d-square
+  sampling_strategy: uniform
+  category: compositional-subgraphs
+  name: conv2d-square
+  torch_ref: benchmarks/compositional-subgraphs/conv2d-square/ref.py
+  description: 'FHE-friendly CNN block: Conv2d(1, 1, kernel_size=3, padding=1) followed by exact square
+    activation'
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 1
+        - 1
+        - 4
+        - 4
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: compositional-subgraphs/linear-softmax
+  seed_id: compositional/matmul-softmax
+  sampling_strategy: uniform
+  category: compositional-subgraphs
+  name: linear-softmax
+  torch_ref: benchmarks/compositional-subgraphs/linear-softmax/ref.py
+  description: 'Attention scores: Q @ K^T followed by row-wise Softmax'
+  n_test_inputs: 5
+  input_specs:
+    - name: q
+      shape:
+        - 1
+        - 4
+        - 8
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: k
+      shape:
+        - 1
+        - 4
+        - 8
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: compositional-subgraphs/sum-relu
+  seed_id: compositional/sum-relu
+  sampling_strategy: uniform
+  category: compositional-subgraphs
+  name: sum-relu
+  torch_ref: benchmarks/compositional-subgraphs/sum-relu/ref.py
+  description: Ciphertext vector sum followed by ReLU
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: compositional-subgraphs/sum-square
+  seed_id: compositional/sum-square
+  sampling_strategy: uniform
+  category: compositional-subgraphs
+  name: sum-square
+  torch_ref: benchmarks/compositional-subgraphs/sum-square/ref.py
+  description: Ciphertext vector sum followed by exact square activation
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 16
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: neural-network-workloads/mlp
+  seed_id: e2e-dnn/mlp
+  sampling_strategy: stratified
+  category: neural-network-workloads
+  name: mlp
+  torch_ref: benchmarks/neural-network-workloads/mlp/ref.py
+  description: 3-layer MLP (784->256->128->10), default init, random input
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 1
+        - 1
+        - 28
+        - 28
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: neural-network-workloads/bert-attention
+  seed_id: e2e-dnn/bert-attention
+  sampling_strategy: stratified
+  category: neural-network-workloads
+  name: bert-attention
+  torch_ref: benchmarks/neural-network-workloads/bert-attention/ref.py
+  description: 'BERT-style attention core on [128,768] embeddings: Q/K/V projections plus first-head (Q
+    @ K.T) @ V, no scaling or softmax'
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 1
+        - 128
+        - 768
+      dtype: float32
+      range:
+        - 0
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: neural-network-workloads/lenet5
+  seed_id: e2e-dnn/lenet5
+  sampling_strategy: stratified
+  category: neural-network-workloads
+  name: lenet5
+  torch_ref: benchmarks/neural-network-workloads/lenet5/ref.py
+  description: LeNet-5 for CIFAR-10 (32x32 RGB), default init, random input
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 1
+        - 3
+        - 32
+        - 32
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: neural-network-workloads/resnet20
+  seed_id: e2e-dnn/resnet20
+  sampling_strategy: stratified
+  category: neural-network-workloads
+  name: resnet20
+  torch_ref: benchmarks/neural-network-workloads/resnet20/ref.py
+  description: ResNet-20 for CIFAR-10 (3 stages x 3 BasicBlocks, current-batch BN + ReLU), default init,
+    random input
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 1
+        - 3
+        - 32
+        - 32
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
+- id: neural-network-workloads/squeezenet
+  seed_id: e2e-dnn/squeezenet
+  sampling_strategy: stratified
+  category: neural-network-workloads
+  name: squeezenet
+  torch_ref: benchmarks/neural-network-workloads/squeezenet/ref.py
+  description: Dropout-free SqueezeNet 1.1 for CIFAR-10 (Fire modules + fixed AvgPool), default init,
+    random input
+  n_test_inputs: 5
+  input_specs:
+    - name: x
+      shape:
+        - 1
+        - 3
+        - 32
+        - 32
+      dtype: float32
+      range:
+        - -1
+        - 1
+      role: ciphertext
+    - name: model
+      role: plaintext
+  accuracy:
+    atol: 0.01
+    rtol: 0.01
